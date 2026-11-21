@@ -21,7 +21,9 @@ public class DemoController {
 
     @PostMapping("/seed")
     @Operation(summary = "重置并装载演示数据", description = "幂等：清空后重建主数据并受理 5 个样例批次"
-            + "（CRF×2/检验/影像/监查）；lab-batch-2 检验更正修订留给验收流程手工上送")
+            + "（CRF×2/检验/影像/监查；lab-batch-2 检验更正修订留给验收流程手工上送）；"
+            + "并装载访视窗口符合性计划目录(v1.0/v2.0)与 34 条活动事件"
+            + "（提前采样/跨窗分次完成/迟报/方案修订/给药中断/无法判定）")
     public Map<String, Object> seed() {
         return demoSeedService.seed();
     }

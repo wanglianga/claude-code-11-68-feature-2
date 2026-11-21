@@ -8,3 +8,7 @@ spring:
     password: ccdev
   flyway:
     enabled: true
+
+app:
+  compliance:
+    as-of: "2026-06-01"   # 固定判定基准日, 使未完成逾期天数在测试中确定

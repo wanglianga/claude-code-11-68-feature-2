@@ -23,3 +23,7 @@ springdoc:
 
 app:
   recon-rule-version: recon-v1.0
+  compliance:
+    rule-version: compliance-v1.0
+    as-of: ${COMPLIANCE_AS_OF:}        # 判定基准日(默认当天); 演示/测试可固定, 如 2026-06-01
+    max-link-distance-days: 45         # 事件关联访视实例的最大锚点距离

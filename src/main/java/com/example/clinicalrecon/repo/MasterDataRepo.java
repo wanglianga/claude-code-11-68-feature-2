@@ -1,6 +1,7 @@
 package com.example.clinicalrecon.repo;
 
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -15,33 +16,36 @@ public class MasterDataRepo {
 
     public MasterDataRepo(JdbcTemplate jdbc) { this.jdbc = jdbc; }
 
-    public record SubjectRow(long id, String trialId, String centerId, String subjectKey, LocalDate enrolledDate) {}
+    public record SubjectRow(long id, String trialId, String centerId, String subjectKey, LocalDate enrolledDate,
+                             String cohort) {}
     public record VisitWindow(String visitCode, int anchorDay, int windowStart, int windowEnd) {}
     public record FieldDef(String fieldKey, String label, String valueType, String unit,
                            boolean requiredForAnalysis, Map<String, List<String>> sourceFieldMap) {}
 
+    private static final RowMapper<SubjectRow> SUBJECT_MAPPER = (rs, i) -> new SubjectRow(
+            rs.getLong("id"), rs.getString("trial_id"), rs.getString("center_id"), rs.getString("subject_key"),
+            rs.getDate("enrolled_date").toLocalDate(), rs.getString("cohort"));
+
     public Optional<SubjectRow> findSubjectByKey(String key) {
-        var list = jdbc.query("select id, trial_id, center_id, subject_key, enrolled_date from subject where subject_key=?",
-                (rs, i) -> new SubjectRow(rs.getLong(1), rs.getString(2), rs.getString(3), rs.getString(4),
-                        rs.getDate(5).toLocalDate()), key);
+        var list = jdbc.query("select * from subject where subject_key=?", SUBJECT_MAPPER, key);
         return list.stream().findFirst();
     }
 
     public Optional<SubjectRow> findSubjectById(long id) {
-        var list = jdbc.query("select id, trial_id, center_id, subject_key, enrolled_date from subject where id=?",
-                (rs, i) -> new SubjectRow(rs.getLong(1), rs.getString(2), rs.getString(3), rs.getString(4),
-                        rs.getDate(5).toLocalDate()), id);
+        var list = jdbc.query("select * from subject where id=?", SUBJECT_MAPPER, id);
         return list.stream().findFirst();
+    }
+
+    public List<SubjectRow> listSubjectRows() {
+        return jdbc.query("select * from subject order by subject_key", SUBJECT_MAPPER);
     }
 
     /** 中心映射：来源中心+外部受试者号 -> 统一受试者 */
     public List<SubjectRow> mapSubject(String centerId, String externalSubjectId) {
         return jdbc.query("""
-                select s.id, s.trial_id, s.center_id, s.subject_key, s.enrolled_date
-                from center_subject_map m join subject s on s.id = m.subject_id
+                select s.* from center_subject_map m join subject s on s.id = m.subject_id
                 where m.center_id=? and m.external_subject_id=?""",
-                (rs, i) -> new SubjectRow(rs.getLong(1), rs.getString(2), rs.getString(3), rs.getString(4),
-                        rs.getDate(5).toLocalDate()), centerId, externalSubjectId);
+                SUBJECT_MAPPER, centerId, externalSubjectId);
     }
 
     public List<VisitWindow> scheduleOf(String trialId) {
@@ -77,7 +81,7 @@ public class MasterDataRepo {
     }
 
     public List<Map<String, Object>> listSubjects() {
-        return jdbc.queryForList("select id, trial_id, center_id, subject_key, enrolled_date from subject order by subject_key");
+        return jdbc.queryForList("select id, trial_id, center_id, subject_key, enrolled_date, cohort from subject order by subject_key");
     }
 
     public List<Map<String, Object>> listSchedule() {

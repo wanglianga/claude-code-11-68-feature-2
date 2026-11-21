@@ -1,5 +1,6 @@
 package com.example.clinicalrecon.domain;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -107,6 +108,24 @@ public final class Dtos {
             long snapshotId, boolean reproducible,
             List<Long> missingInReplay, List<Long> extraInReplay, String message
     ) {}
+
+    // ---------- 访视窗口符合性 ----------
+    public record ComplianceEventIn(
+            @NotBlank String eventUid,
+            @NotBlank String centerId,
+            @NotBlank String externalSubjectId,
+            @NotBlank String activityType,      // ASSESSMENT / SAMPLING / IMAGING / DOSING
+            @NotBlank String activityCode,
+            OffsetDateTime occurredAt,
+            LocalDate occurredDate,
+            String timePrecision,               // 默认 DATE
+            OffsetDateTime reportedAt,          // 结果回报时间(采样类; 数据时效另记)
+            String visitCode,                   // 来源显式访视编码(可空)
+            Boolean dosingInterrupted,          // 给药中断标记
+            String sourceRef
+    ) {}
+
+    public record ComplianceEventBatchIn(@NotNull List<@Valid ComplianceEventIn> events) {}
 
     // ---------- 通用 ----------
     public record ErrorOut(String error, String message) {}

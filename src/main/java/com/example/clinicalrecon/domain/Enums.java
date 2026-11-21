@@ -99,4 +99,40 @@ public final class Enums {
         public static final String LAB = "LAB";     // 中心实验室
         public static final String PI = "PI";       // 主要研究者
     }
+
+    /** 访视活动类型（窗口符合性） */
+    public static final class ActivityType {
+        public static final String ASSESSMENT = "ASSESSMENT";   // 问诊
+        public static final String SAMPLING = "SAMPLING";       // 采样
+        public static final String IMAGING = "IMAGING";         // 影像采集
+        public static final String DOSING = "DOSING";           // 给药
+        public static final java.util.Set<String> ALL = java.util.Set.of(ASSESSMENT, SAMPLING, IMAGING, DOSING);
+    }
+
+    /** 活动级窗口判定状态 */
+    public static final class Judgment {
+        public static final String EARLY = "EARLY";                       // 提前
+        public static final String ON_WINDOW = "ON_WINDOW";               // 按窗
+        public static final String LATE = "LATE";                         // 延迟
+        public static final String NOT_DONE = "NOT_DONE";                 // 未完成
+        public static final String INDETERMINATE = "INDETERMINATE";       // 无法判定
+        public static final String NOT_APPLICABLE = "NOT_APPLICABLE";     // 不适用(给药中断/人群不适用)
+    }
+
+    /** 访视级汇总状态 */
+    public static final class VisitStatus {
+        public static final String ON_WINDOW = "ON_WINDOW";               // 全部按窗
+        public static final String DEVIATED = "DEVIATED";                 // 已完成但含提前/延迟
+        public static final String INCOMPLETE = "INCOMPLETE";             // 含未完成
+        public static final String INDETERMINATE = "INDETERMINATE";       // 含无法判定
+        public static final String NOT_APPLICABLE = "NOT_APPLICABLE";     // 不适用(非漏访)
+    }
+
+    /** 活动事件关联状态（事件整理器） */
+    public static final class EventLink {
+        public static final String LINKED = "LINKED";           // 已定位访视实例
+        public static final String AMBIGUOUS = "AMBIGUOUS";     // 多候选保留, 不擅自分配
+        public static final String UNLINKED = "UNLINKED";       // 无法定位(映射缺失/无时间/远离窗口)
+        public static final String MARKER = "MARKER";           // 给药中断标记事件, 不作活动证据
+    }
 }
